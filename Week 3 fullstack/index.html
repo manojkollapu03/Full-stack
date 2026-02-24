@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BREZNOX – Operations Platform</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ============================= LOGIN ============================= -->
+<div id="login">
+  <div class="login-box">
+    <div class="brand">BREZNOX</div>
+    <div class="sub">Enterprise Internal Operations Platform</div>
+    <div class="err" id="err">Incorrect credentials. Please try again.</div>
+    <label>Username</label>
+    <input type="text" id="un" placeholder="admin"/>
+    <label>Password</label>
+    <input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/>
+    <div class="hint">Demo — Username: <strong>admin</strong> &nbsp;/&nbsp; Password: <strong>breznox2024</strong></div>
+    <button class="btn btn-dark" onclick="login()">Sign In</button>
+  </div>
+</div>
+
+<!-- ============================= APP ============================= -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">BREZNOX <span>OPS PLATFORM</span></div>
+      <nav>
+        <div class="nav-sep">WORKSPACE</div>
+        <a onclick="go('tasks')"         id="n-tasks">✔ Task Management</a>
+        <a onclick="go('approvals')"     id="n-approvals">⊙ Approval System</a>
+        <a onclick="go('documents')"     id="n-documents">◻ Documents</a>
+        <a onclick="go('notifications')" id="n-notifications">🔔 Notifications</a>
+        <div class="nav-sep">INSIGHTS</div>
+        <a onclick="go('reports')"       id="n-reports">📄 Reports</a>
+        <a onclick="go('analytics')"     id="n-analytics">📊 Analytics</a>
+        <div class="nav-sep">GENERAL</div>
+        <a onclick="go('features')"      id="n-features">⊞ Features</a>
+        <a onclick="go('about')"         id="n-about">ℹ About</a>
+        <div class="nav-sep">ACCOUNT</div>
+        <a onclick="go('profile')"       id="n-profile">👤 Profile</a>
+        <a onclick="go('account')"       id="n-account">🔑 Login &amp; Account</a>
+      </nav>
+      <div class="sidebar-foot">Logged in as <strong>admin</strong></div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <h2 id="ptitle">Task Management</h2>
+        <div class="user">
+          <span id="tdate"></span>
+          <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+      <!-- ======= TASKS ======= -->
+      <div class="sec on" id="s-tasks">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Task Management</div>
+            <div class="sec-sub">Assign and track all organizational tasks at BREZNOX.</div>
+          </div>
+          <button class="btn btn-dark" onclick="openModal('taskModal')">+ Assign Task</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="lbl">Total Tasks</div><div class="val">12</div></div>
+          <div class="stat"><div class="lbl">Completed</div><div class="val g">5</div></div>
+          <div class="stat"><div class="lbl">In Progress</div><div class="val a">5</div></div>
+          <div class="stat"><div class="lbl">Pending</div><div class="val r">2</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            All Tasks
+            <select class="btn btn-outline btn-sm" onchange="filterTasks(this.value)">
+              <option value="all">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="in-progress">In Progress</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Task</th><th>Assigned To</th><th>Dept.</th><th>Deadline</th><th>Progress</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="taskBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= APPROVALS ======= -->
+      <div class="sec" id="s-approvals">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Approval System</div>
+            <div class="sec-sub">Review and act on pending requests from all departments.</div>
+          </div>
+          <button class="btn btn-dark" onclick="addApproval()">+ New Request</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="lbl">Total</div><div class="val">10</div></div>
+          <div class="stat"><div class="lbl">Approved</div><div class="val g">4</div></div>
+          <div class="stat"><div class="lbl">Pending</div><div class="val a">4</div></div>
+          <div class="stat"><div class="lbl">Rejected</div><div class="val r">2</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">Approval Requests</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Request</th><th>By</th><th>Dept.</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="apprBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= DOCUMENTS ======= -->
+      <div class="sec" id="s-documents">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Documents</div>
+            <div class="sec-sub">Upload and manage all company documents securely.</div>
+          </div>
+          <label class="btn btn-dark" style="cursor:pointer;">
+            ↑ Upload File
+            <input type="file" style="display:none" onchange="uploadFile(event)"/>
+          </label>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="lbl">Total Files</div><div class="val" id="docTotal">6</div></div>
+          <div class="stat"><div class="lbl">PDFs</div><div class="val g">3</div></div>
+          <div class="stat"><div class="lbl">Spreadsheets</div><div class="val a">2</div></div>
+          <div class="stat"><div class="lbl">Other</div><div class="val r">1</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head">Document Library</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>File Name</th><th>Type</th><th>Uploaded By</th><th>Date</th><th>Size</th><th>Actions</th></tr></thead>
+              <tbody id="docBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= NOTIFICATIONS ======= -->
+      <div class="sec" id="s-notifications">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Notifications</div>
+            <div class="sec-sub">System alerts, task updates and important announcements.</div>
+          </div>
+          <button class="btn btn-outline" onclick="markAll()">Mark All Read</button>
+        </div>
+        <div class="card" id="notifList"></div>
+      </div>
+
+      <!-- ======= REPORTS ======= -->
+      <div class="sec" id="s-reports">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Reports</div>
+            <div class="sec-sub">Task and document activity summaries for this period.</div>
+          </div>
+          <button class="btn btn-dark" onclick="toast('Report exported successfully!')">↓ Export PDF</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="lbl">Tasks Done (Month)</div><div class="val g">18</div></div>
+          <div class="stat"><div class="lbl">Docs Uploaded</div><div class="val">11</div></div>
+          <div class="stat"><div class="lbl">Approvals</div><div class="val">10</div></div>
+          <div class="stat"><div class="lbl">Avg. Rate</div><div class="val a">74%</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="card">
+            <div class="card-head">Task Completion by Employee</div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Employee</th><th>Done</th><th>On Time</th><th>Late</th></tr></thead>
+                <tbody>
+                  <tr><td>Ananya Sharma</td><td>6</td><td><span class="badge bg">5</span></td><td><span class="badge br">1</span></td></tr>
+                  <tr><td>Rohan Mehta</td><td>4</td><td><span class="badge bg">4</span></td><td><span class="badge br">0</span></td></tr>
+                  <tr><td>Priya Nair</td><td>3</td><td><span class="badge bg">2</span></td><td><span class="badge br">1</span></td></tr>
+                  <tr><td>Kunal Joshi</td><td>5</td><td><span class="badge bg">4</span></td><td><span class="badge br">1</span></td></tr>
+                  <tr><td>Sneha Pillai</td><td>2</td><td><span class="badge bg">2</span></td><td><span class="badge br">0</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">Document Uploads by Employee</div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Employee</th><th>Files</th><th>Last Upload</th><th>Total Size</th></tr></thead>
+                <tbody>
+                  <tr><td>Ananya Sharma</td><td>4</td><td>Dec 10</td><td>12.4 MB</td></tr>
+                  <tr><td>Kunal Joshi</td><td>3</td><td>Dec 11</td><td>9.8 MB</td></tr>
+                  <tr><td>Rohan Mehta</td><td>2</td><td>Dec 08</td><td>6.1 MB</td></tr>
+                  <tr><td>Sneha Pillai</td><td>1</td><td>Dec 05</td><td>2.2 MB</td></tr>
+                  <tr><td>Vikram Das</td><td>1</td><td>Dec 09</td><td>3.5 MB</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= ANALYTICS ======= -->
+      <div class="sec" id="s-analytics">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Analytics</div>
+            <div class="sec-sub">Visual overview of team productivity and task trends.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div class="card">
+            <div class="card-head">Tasks by Status</div>
+            <div class="card-body">
+              <div class="chart">
+                <div class="ch-col"><div class="ch-val">5</div><div class="ch-bar g" style="height:65%"></div><div class="ch-lbl">Completed</div></div>
+                <div class="ch-col"><div class="ch-val">5</div><div class="ch-bar a" style="height:65%"></div><div class="ch-lbl">In Progress</div></div>
+                <div class="ch-col"><div class="ch-val">2</div><div class="ch-bar r" style="height:26%"></div><div class="ch-lbl">Pending</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">Monthly Completions</div>
+            <div class="card-body">
+              <div class="chart">
+                <div class="ch-col"><div class="ch-val">8</div><div class="ch-bar b" style="height:40%"></div><div class="ch-lbl">Jul</div></div>
+                <div class="ch-col"><div class="ch-val">11</div><div class="ch-bar b" style="height:55%"></div><div class="ch-lbl">Aug</div></div>
+                <div class="ch-col"><div class="ch-val">9</div><div class="ch-bar b" style="height:45%"></div><div class="ch-lbl">Sep</div></div>
+                <div class="ch-col"><div class="ch-val">14</div><div class="ch-bar b" style="height:70%"></div><div class="ch-lbl">Oct</div></div>
+                <div class="ch-col"><div class="ch-val">12</div><div class="ch-bar b" style="height:60%"></div><div class="ch-lbl">Nov</div></div>
+                <div class="ch-col"><div class="ch-val">18</div><div class="ch-bar b" style="height:90%"></div><div class="ch-lbl">Dec</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">Employee Completion Rate</div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:13px;">
+            <div class="prog"><span style="min-width:130px;font-size:13px;">Ananya Sharma</span><div class="pbar"><div class="pfill g" style="width:92%"></div></div><span class="pct">92%</span></div>
+            <div class="prog"><span style="min-width:130px;font-size:13px;">Rohan Mehta</span><div class="pbar"><div class="pfill g" style="width:85%"></div></div><span class="pct">85%</span></div>
+            <div class="prog"><span style="min-width:130px;font-size:13px;">Kunal Joshi</span><div class="pbar"><div class="pfill g" style="width:78%"></div></div><span class="pct">78%</span></div>
+            <div class="prog"><span style="min-width:130px;font-size:13px;">Priya Nair</span><div class="pbar"><div class="pfill a" style="width:65%"></div></div><span class="pct">65%</span></div>
+            <div class="prog"><span style="min-width:130px;font-size:13px;">Sneha Pillai</span><div class="pbar"><div class="pfill a" style="width:58%"></div></div><span class="pct">58%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= FEATURES ======= -->
+      <div class="sec" id="s-features">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Platform Features</div>
+            <div class="sec-sub">Everything BREZNOX OPS Platform offers your organisation.</div>
+          </div>
+        </div>
+        <div class="feat-grid">
+          <div class="feat"><div class="ficon">✔</div><h4>Task Management</h4><p>Assign, track and monitor tasks across all teams with deadlines and real-time progress updates.</p></div>
+          <div class="feat"><div class="ficon">⊙</div><h4>Approval Workflows</h4><p>Multi-level approval routing with instant notifications and a full audit trail for every request.</p></div>
+          <div class="feat"><div class="ficon">◻</div><h4>Document Storage</h4><p>Central repository for all company files with upload, download and role-based access control.</p></div>
+          <div class="feat"><div class="ficon">📊</div><h4>Analytics</h4><p>Real-time charts and performance dashboards to drive data-informed operational decisions.</p></div>
+          <div class="feat"><div class="ficon">🔔</div><h4>Notifications</h4><p>Smart alerts, deadline reminders and announcements for all important events and updates.</p></div>
+          <div class="feat"><div class="ficon">🔒</div><h4>Role-Based Access</h4><p>Granular permissions ensuring the right people access the right data at all times.</p></div>
+        </div>
+      </div>
+
+      <!-- ======= ABOUT ======= -->
+      <div class="sec" id="s-about">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">About</div>
+            <div class="sec-sub">Company information and platform details.</div>
+          </div>
+        </div>
+        <div class="about-grid">
+          <div class="card" style="padding:26px;">
+            <div class="about-logo">BX</div>
+            <h3 style="font-size:17px;margin-bottom:6px;">BREZNOX Technologies Inc.</h3>
+            <p style="font-size:13px;color:#8a8a85;margin-bottom:12px;">Building the future of enterprise software since 2012.</p>
+            <p style="font-size:13px;color:#52524e;line-height:1.7;">BREZNOX is a global technology company headquartered in Bengaluru, India, with offices in New York, London, Singapore and Dubai. We specialise in enterprise software, cloud infrastructure, AI automation and digital transformation consulting for mid-to-large enterprises worldwide.</p>
+            <div class="meta-row">
+              <div class="meta-box"><strong>2012</strong><small>Founded</small></div>
+              <div class="meta-box"><strong>2,400+</strong><small>Employees</small></div>
+              <div class="meta-box"><strong>870+</strong><small>Clients</small></div>
+              <div class="meta-box"><strong>34</strong><small>Countries</small></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="card" style="padding:20px;">
+              <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;color:#3d5a80;">About This Platform</h4>
+              <ul class="info-list">
+                <li>📌 <strong>Enterprise Internal Operations Platform</strong></li>
+                <li>🔢 Version: <strong>v4.2.1</strong> &nbsp;·&nbsp; Released Dec 2024</li>
+                <li>🏗 Built by: <strong>BREZNOX Core Engineering</strong></li>
+                <li>📜 License: <strong>Enterprise Commercial</strong></li>
+                <li>⏱ Uptime SLA: <strong>99.95%</strong></li>
+                <li>🌏 Data Region: <strong>Asia-Pacific</strong></li>
+              </ul>
+            </div>
+            <div class="card" style="padding:20px;">
+              <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;color:#3d5a80;">Contact &amp; Support</h4>
+              <ul class="info-list">
+                <li>🌐 <strong>www.breznox.com</strong></li>
+                <li>📧 <strong>support@breznox.com</strong></li>
+                <li>📞 <strong>+91 80 4000 7777</strong></li>
+                <li>🏢 HQ: Bengaluru, Karnataka, India</li>
+                <li style="margin-top:6px;font-size:11px;color:#aaa;">© 2024 BREZNOX Technologies Inc. All rights reserved.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= PROFILE ======= -->
+      <div class="sec" id="s-profile">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">My Profile</div>
+            <div class="sec-sub">Edit your personal information and account preferences.</div>
+          </div>
+          <button class="btn btn-dark" onclick="saveProfile()">Save Changes</button>
+        </div>
+        <div class="profile-layout">
+          <div class="p-meta">
+            <div class="avatar" id="avCircle">AD</div>
+            <div class="name" id="pDisName">Admin User</div>
+            <div class="role">System Administrator</div>
+            <label class="btn btn-outline btn-sm" style="cursor:pointer;margin-top:10px;display:block;">
+              Change Photo
+              <input type="file" accept="image/*" style="display:none" onchange="changeAvatar(event)"/>
+            </label>
+            <div style="margin-top:14px;">
+              <div class="p-stat"><span>Member Since</span><strong>Jan 2022</strong></div>
+              <div class="p-stat"><span>Tasks Done</span><strong>47</strong></div>
+              <div class="p-stat"><span>Documents</span><strong>12</strong></div>
+              <div class="p-stat"><span>Approvals</span><strong>28</strong></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="padding:20px;margin-bottom:14px;">
+              <div class="card-head" style="margin:-20px -20px 16px;border-radius:8px 8px 0 0;">Personal Information</div>
+              <div class="frow">
+                <div class="fg"><label>First Name</label><input id="pf" value="Admin"/></div>
+                <div class="fg"><label>Last Name</label><input id="pl" value="User"/></div>
+                <div class="fg"><label>Email</label><input type="email" id="pe" value="admin@breznox.com"/></div>
+                <div class="fg"><label>Phone</label><input id="pp" value="+91 98765 43210"/></div>
+                <div class="fg"><label>Department</label>
+                  <select id="pd"><option>Administration</option><option>Engineering</option><option>Design</option><option>QA</option><option>DevOps</option><option>HR</option></select>
+                </div>
+                <div class="fg"><label>Designation</label><input id="pdes" value="System Administrator"/></div>
+                <div class="fg"><label>Location</label><input id="ploc" value="Bengaluru, India"/></div>
+                <div class="fg"><label>Employee ID</label><input value="BRZ-00001" readonly style="opacity:.6;"/></div>
+              </div>
+              <div class="fg"><label>Bio</label><textarea id="pbio">System Administrator at BREZNOX Technologies with 8+ years of experience in enterprise software and internal operations.</textarea></div>
+            </div>
+            <div class="card" style="padding:20px;">
+              <div class="card-head" style="margin:-20px -20px 16px;border-radius:8px 8px 0 0;">Change Password</div>
+              <div class="frow">
+                <div class="fg"><label>Current Password</label><input type="password" id="cp" placeholder="Current password"/></div>
+                <div class="fg"><label>New Password</label><input type="password" id="np" placeholder="New password"/></div>
+                <div class="fg"><label>Confirm Password</label><input type="password" id="cnp" placeholder="Confirm password"/></div>
+              </div>
+              <button class="btn btn-outline" onclick="changePwd()">Update Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= ACCOUNT ======= -->
+      <div class="sec" id="s-account">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Login &amp; Account</div>
+            <div class="sec-sub">Manage accounts, sessions and access controls.</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-head">Current Session</div>
+          <div class="sess">
+            <div class="sess-av">AD</div>
+            <div class="sess-info">
+              <strong>Admin User</strong>
+              <small>admin@breznox.com &nbsp;·&nbsp; Last login: Today 09:41 AM &nbsp;·&nbsp; Bengaluru, IN</small>
+              <div style="margin-top:6px;"><span class="badge bg">● Active Session</span></div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:10px;">
+              <button class="btn btn-outline btn-sm" onclick="go('profile')">View Profile</button>
+              <button class="btn btn-red btn-sm" onclick="logout()">Logout</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-head">
+            Registered Accounts
+            <button class="btn btn-dark btn-sm" onclick="openModal('accModal')">+ Add Account</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="accBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">Recent Login History</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Date &amp; Time</th><th>IP Address</th><th>Location</th><th>Result</th></tr></thead>
+              <tbody>
+                <tr><td>admin</td><td>Dec 12, 2024 · 09:41 AM</td><td>103.21.45.12</td><td>Bengaluru, IN</td><td><span class="badge bg">Success</span></td></tr>
+                <tr><td>rohan.m</td><td>Dec 12, 2024 · 08:55 AM</td><td>103.21.45.19</td><td>Bengaluru, IN</td><td><span class="badge bg">Success</span></td></tr>
+                <tr><td>priya.n</td><td>Dec 11, 2024 · 06:30 PM</td><td>202.65.10.88</td><td>Mumbai, IN</td><td><span class="badge bg">Success</span></td></tr>
+                <tr><td>unknown</td><td>Dec 11, 2024 · 02:12 AM</td><td>45.92.170.3</td><td>Unknown</td><td><span class="badge br">Failed</span></td></tr>
+                <tr><td>kunal.j</td><td>Dec 10, 2024 · 09:05 AM</td><td>103.21.45.21</td><td>Bengaluru, IN</td><td><span class="badge bg">Success</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- ======= MODAL: Assign Task ======= -->
+<div class="modal" id="taskModal">
+  <div class="modal-box">
+    <h3>Assign New Task</h3>
+    <div class="frow">
+      <div class="fg"><label>Task Name</label><input id="tn" placeholder="e.g. Build Login API"/></div>
+      <div class="fg"><label>Assigned To</label>
+        <select id="ta"><option>Ananya Sharma</option><option>Rohan Mehta</option><option>Priya Nair</option><option>Kunal Joshi</option><option>Sneha Pillai</option><option>Vikram Das</option></select>
+      </div>
+      <div class="fg"><label>Department</label>
+        <select id="td"><option>Engineering</option><option>Design</option><option>QA</option><option>DevOps</option><option>HR</option><option>Finance</option></select>
+      </div>
+      <div class="fg"><label>Deadline</label><input type="date" id="tdd"/></div>
+      <div class="fg"><label>Priority</label>
+        <select id="tp"><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="fg"><label>Completion %</label><input type="number" id="tpct" value="0" min="0" max="100"/></div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-outline" onclick="closeModal('taskModal')">Cancel</button>
+      <button class="btn btn-dark" onclick="assignTask()">Assign Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= MODAL: Add Account ======= -->
+<div class="modal" id="accModal">
+  <div class="modal-box">
+    <h3>Add New Account</h3>
+    <div class="frow">
+      <div class="fg"><label>Full Name</label><input id="an" placeholder="Full name"/></div>
+      <div class="fg"><label>Username</label><input id="au" placeholder="username"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="ae" placeholder="email@breznox.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="apw" placeholder="Password"/></div>
+      <div class="fg"><label>Role</label><select id="ar"><option>Admin</option><option>Manager</option><option>Employee</option><option>Viewer</option></select></div>
+      <div class="fg"><label>Department</label><select id="adept"><option>Engineering</option><option>Design</option><option>QA</option><option>DevOps</option><option>HR</option><option>Administration</option></select></div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-outline" onclick="closeModal('accModal')">Cancel</button>
+      <button class="btn btn-dark" onclick="addAccount()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ===== DATA ===== */
+let tasks = [
+  {id:'TSK-001',name:'REST API – User Auth Module',        to:'Ananya Sharma', dept:'Engineering',deadline:'2024-12-20',pct:85, status:'in-progress'},
+  {id:'TSK-002',name:'UI/UX Dashboard Redesign v3',       to:'Rohan Mehta',   dept:'Design',     deadline:'2024-12-15',pct:100,status:'completed'},
+  {id:'TSK-003',name:'Regression Test Cases – Sprint 14', to:'Priya Nair',    dept:'QA',         deadline:'2024-12-18',pct:60, status:'in-progress'},
+  {id:'TSK-004',name:'CI/CD Pipeline – AWS EKS',          to:'Kunal Joshi',   dept:'DevOps',     deadline:'2024-12-22',pct:40, status:'in-progress'},
+  {id:'TSK-005',name:'Onboarding Documentation Update',   to:'Sneha Pillai',  dept:'HR',         deadline:'2024-12-14',pct:100,status:'completed'},
+  {id:'TSK-006',name:'Database Schema Optimization',      to:'Ananya Sharma', dept:'Engineering',deadline:'2024-12-28',pct:20, status:'in-progress'},
+  {id:'TSK-007',name:'Figma Prototype – Mobile App v2',   to:'Rohan Mehta',   dept:'Design',     deadline:'2024-12-30',pct:100,status:'completed'},
+  {id:'TSK-008',name:'Penetration Testing – Production',  to:'Vikram Das',    dept:'DevOps',     deadline:'2024-12-25',pct:0,  status:'pending'},
+  {id:'TSK-009',name:'Q4 Payroll Processing',             to:'Sneha Pillai',  dept:'Finance',    deadline:'2024-12-31',pct:0,  status:'pending'},
+  {id:'TSK-010',name:'Code Review – Notification Svc',    to:'Priya Nair',    dept:'QA',         deadline:'2024-12-16',pct:100,status:'completed'},
+  {id:'TSK-011',name:'Kubernetes Cluster Upgrade',        to:'Kunal Joshi',   dept:'DevOps',     deadline:'2024-12-29',pct:50, status:'in-progress'},
+  {id:'TSK-012',name:'Product Roadmap Deck – Q1 2025',    to:'Ananya Sharma', dept:'Engineering',deadline:'2024-12-12',pct:100,status:'completed'},
+];
+
+let approvals = [
+  {id:'APR-001',title:'Leave Request – Ananya (15 days)',      by:'Ananya Sharma',dept:'Engineering',date:'Dec 01',status:'approved'},
+  {id:'APR-002',title:'Budget – Q1 Cloud Infrastructure',      by:'Kunal Joshi',  dept:'DevOps',     date:'Dec 03',status:'pending'},
+  {id:'APR-003',title:'Software License – Figma Pro',          by:'Rohan Mehta',  dept:'Design',     date:'Dec 04',status:'approved'},
+  {id:'APR-004',title:'Overtime Auth – QA Team Dec',           by:'Priya Nair',   dept:'QA',         date:'Dec 05',status:'rejected'},
+  {id:'APR-005',title:'Vendor Contract – AWS Reserved',        by:'Kunal Joshi',  dept:'DevOps',     date:'Dec 06',status:'pending'},
+  {id:'APR-006',title:'Team Offsite Event Budget',             by:'Sneha Pillai', dept:'HR',         date:'Dec 07',status:'approved'},
+  {id:'APR-007',title:'Access Provisioning – New Dev Hire',    by:'Sneha Pillai', dept:'HR',         date:'Dec 08',status:'pending'},
+  {id:'APR-008',title:'Office Equipment – Monitors x4',        by:'Ananya Sharma',dept:'Engineering',date:'Dec 09',status:'pending'},
+  {id:'APR-009',title:'Training Budget – Cloud Certification', by:'Vikram Das',   dept:'DevOps',     date:'Dec 10',status:'approved'},
+  {id:'APR-010',title:'Marketing Content – Blog Post Review',  by:'Rohan Mehta',  dept:'Design',     date:'Dec 11',status:'rejected'},
+];
+
+let docs = [
+  {name:'Employee_Handbook_2024.pdf',   type:'PDF', by:'Sneha Pillai',  date:'Dec 01',size:'3.4 MB'},
+  {name:'Q4_Financial_Report.xlsx',     type:'XLSX',by:'Ananya Sharma', date:'Dec 03',size:'1.2 MB'},
+  {name:'System_Architecture.pdf',      type:'PDF', by:'Kunal Joshi',   date:'Dec 05',size:'5.8 MB'},
+  {name:'Brand_Guidelines_v3.pdf',      type:'PDF', by:'Rohan Mehta',   date:'Dec 07',size:'8.1 MB'},
+  {name:'Sprint14_Test_Cases.xlsx',     type:'XLSX',by:'Priya Nair',    date:'Dec 08',size:'920 KB'},
+  {name:'AWS_Infrastructure_Notes.txt', type:'TXT', by:'Vikram Das',    date:'Dec 09',size:'45 KB'},
+];
+
+let notifs = [
+  {color:'r',title:'Task Overdue',          msg:'TSK-009 "Q4 Payroll" is due today.',             time:'2 hrs ago', unread:true},
+  {color:'a',title:'Approval Pending',      msg:'APR-005 requires your review.',                  time:'3 hrs ago', unread:true},
+  {color:'b',title:'New Task Assigned',     msg:'TSK-008 assigned to Vikram Das.',                time:'5 hrs ago', unread:true},
+  {color:'a',title:'Document Uploaded',     msg:'Rohan Mehta uploaded Brand_Guidelines_v3.pdf.',  time:'1 day ago', unread:true},
+  {color:'g',title:'Task Completed',        msg:'TSK-010 marked complete by Priya Nair.',         time:'1 day ago', unread:false},
+  {color:'g',title:'Approval Granted',      msg:'APR-009 Training Budget approved.',              time:'2 days ago',unread:false},
+  {color:'b',title:'System Maintenance',    msg:'Scheduled maintenance Dec 15, 2:00–4:00 AM.',   time:'3 days ago',unread:false},
+  {color:'r',title:'Failed Login Attempt',  msg:'Unauthorized login from IP 45.92.170.3.',        time:'4 days ago',unread:false},
+];
+
+let accounts = [
+  {name:'Admin User',    user:'admin',    role:'Admin',    status:'active'},
+  {name:'Ananya Sharma', user:'ananya.s', role:'Manager',  status:'active'},
+  {name:'Rohan Mehta',   user:'rohan.m',  role:'Employee', status:'active'},
+  {name:'Priya Nair',    user:'priya.n',  role:'Employee', status:'active'},
+  {name:'Kunal Joshi',   user:'kunal.j',  role:'Employee', status:'active'},
+  {name:'Sneha Pillai',  user:'sneha.p',  role:'Manager',  status:'inactive'},
+  {name:'Vikram Das',    user:'vikram.d', role:'Employee', status:'active'},
+];
+
+/* ===== AUTH ===== */
+function login() {
+  const u = document.getElementById('un').value.trim();
+  const p = document.getElementById('pw').value;
+  if (u === 'admin' && p === 'breznox2024') {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('tdate').textContent = new Date().toDateString();
+    render(); go('tasks');
+  } else {
+    document.getElementById('err').style.display = 'block';
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login').style.display !== 'none') login();
+});
+
+function logout() {
+  if (!confirm('Are you sure you want to logout?')) return;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('un').value = '';
+  document.getElementById('pw').value = '';
+  document.getElementById('err').style.display = 'none';
+}
+
+/* ===== NAVIGATION ===== */
+function go(id) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('on');
+  document.getElementById('n-' + id).classList.add('active');
+  const titles = {tasks:'Task Management',approvals:'Approval System',documents:'Documents',notifications:'Notifications',reports:'Reports',analytics:'Analytics',features:'Features',about:'About',profile:'Profile',account:'Login & Account'};
+  document.getElementById('ptitle').textContent = titles[id] || id;
+}
+
+/* ===== RENDER ===== */
+function render() { renderTasks(tasks); renderApprovals(); renderDocs(); renderNotifs(); renderAccounts(); }
+
+/* ===== TASKS ===== */
+function renderTasks(list) {
+  document.getElementById('taskBody').innerHTML = list.map((t, i) => {
+    const pc = t.pct === 100 ? 'g' : t.pct >= 40 ? 'a' : 'r';
+    const sc = t.status === 'completed' ? 'bg' : t.status === 'in-progress' ? 'ba' : 'br';
+    const sl = t.status === 'in-progress' ? 'In Progress' : t.status.charAt(0).toUpperCase() + t.status.slice(1);
+    const idx = tasks.indexOf(t);
+    return `<tr>
+      <td style="font-family:monospace;font-size:12px;color:#8a8a85">${t.id}</td>
+      <td>${t.name}</td><td>${t.to}</td><td>${t.dept}</td><td>${t.deadline}</td>
+      <td><div class="prog"><div class="pbar"><div class="pfill ${pc}" style="width:${t.pct}%"></div></div><span class="pct">${t.pct}%</span></div></td>
+      <td><span class="badge ${sc}">${sl}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="editTask(${idx})">Edit</button>
+        <button class="btn btn-red btn-sm" onclick="delTask(${idx})">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTasks(v) { renderTasks(v === 'all' ? tasks : tasks.filter(t => t.status === v)); }
+
+function delTask(i) { if (confirm('Delete this task?')) { tasks.splice(i,1); renderTasks(tasks); toast('Task deleted.'); } }
+
+function editTask(i) {
+  const v = prompt(`Update % for "${tasks[i].name}" (0–100):`, tasks[i].pct);
+  if (v === null) return;
+  const n = parseInt(v);
+  if (isNaN(n) || n < 0 || n > 100) return toast('Enter a value between 0 and 100.');
+  tasks[i].pct = n;
+  tasks[i].status = n === 100 ? 'completed' : n === 0 ? 'pending' : 'in-progress';
+  renderTasks(tasks); toast('Task updated!');
+}
+
+function assignTask() {
+  const name = document.getElementById('tn').value.trim();
+  if (!name) return toast('Please enter a task name.');
+  const pct = parseInt(document.getElementById('tpct').value) || 0;
+  tasks.push({
+    id: 'TSK-' + String(tasks.length + 1).padStart(3,'0'),
+    name, to: document.getElementById('ta').value,
+    dept: document.getElementById('td').value,
+    deadline: document.getElementById('tdd').value || 'TBD',
+    pct, status: pct === 100 ? 'completed' : pct === 0 ? 'pending' : 'in-progress'
+  });
+  renderTasks(tasks); closeModal('taskModal');
+  document.getElementById('tn').value = ''; toast('Task assigned!');
+}
+
+/* ===== APPROVALS ===== */
+function renderApprovals() {
+  document.getElementById('apprBody').innerHTML = approvals.map((a, i) => {
+    const sc = a.status === 'approved' ? 'bg' : a.status === 'rejected' ? 'br' : 'ba';
+    const btns = a.status === 'pending'
+      ? `<button class="btn btn-green btn-sm" onclick="setAppr(${i},'approved')">Approve</button> <button class="btn btn-red btn-sm" onclick="setAppr(${i},'rejected')">Reject</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="setAppr(${i},'pending')">Reset</button>`;
+    return `<tr>
+      <td style="font-family:monospace;font-size:12px;color:#8a8a85">${a.id}</td>
+      <td>${a.title}</td><td>${a.by}</td><td>${a.dept}</td><td>${a.date}</td>
+      <td><span class="badge ${sc}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+      <td style="display:flex;gap:6px;">${btns}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setAppr(i, s) { approvals[i].status = s; renderApprovals(); toast('Status updated.'); }
+
+function addApproval() {
+  const t = prompt('Enter new approval request title:');
+  if (!t) return;
+  approvals.push({id:'APR-'+String(approvals.length+1).padStart(3,'0'),title:t,by:'Admin User',dept:'Administration',date:'Dec 12',status:'pending'});
+  renderApprovals(); toast('Request added.');
+}
+
+/* ===== DOCUMENTS ===== */
+function renderDocs() {
+  document.getElementById('docBody').innerHTML = docs.map((d, i) => `
+    <tr>
+      <td>📄 ${d.name}</td>
+      <td><span class="badge bb">${d.type}</span></td>
+      <td>${d.by}</td><td>${d.date}</td><td>${d.size}</td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="alert('Downloading: ${d.name}')">↓ Download</button>
+        <button class="btn btn-red btn-sm" onclick="delDoc(${i})">Delete</button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('docTotal').textContent = docs.length;
+}
+
+function delDoc(i) { if (confirm(`Delete "${docs[i].name}"?`)) { docs.splice(i,1); renderDocs(); toast('File deleted.'); } }
+
+function uploadFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const ext = f.name.split('.').pop().toUpperCase();
+  docs.push({name:f.name,type:ext,by:'Admin User',date:'Dec 12',size:(f.size>1048576?(f.size/1048576).toFixed(1)+' MB':(f.size/1024).toFixed(0)+' KB')});
+  renderDocs(); toast(`"${f.name}" uploaded successfully!`); e.target.value='';
+}
+
+/* ===== NOTIFICATIONS ===== */
+function renderNotifs() {
+  document.getElementById('notifList').innerHTML = notifs.map((n, i) => `
+    <div class="notif-item ${n.unread?'unread':''}">
+      <div class="ndot ${n.color}"></div>
+      <div class="ntxt">
+        <strong>${n.title}</strong>
+        <span>${n.msg}</span>
+        <small>${n.time}</small>
+      </div>
+      ${n.unread ? `<button class="btn btn-outline btn-sm" onclick="markRead(${i})">Mark Read</button>` : '<span style="font-size:11px;color:#bbb">Read</span>'}
+    </div>`).join('');
+}
+
+function markRead(i) { notifs[i].unread = false; renderNotifs(); toast('Marked as read.'); }
+function markAll()   { notifs.forEach(n => n.unread = false); renderNotifs(); toast('All notifications marked as read.'); }
+
+/* ===== ACCOUNTS ===== */
+function renderAccounts() {
+  document.getElementById('accBody').innerHTML = accounts.map((a, i) => `
+    <tr>
+      <td>${a.name}</td>
+      <td style="font-family:monospace;font-size:12px;color:#8a8a85">${a.user}</td>
+      <td>${a.role}</td>
+      <td><span class="badge ${a.status==='active'?'bg':'br'}">${a.status}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="toggleAcc(${i})">${a.status==='active'?'Deactivate':'Activate'}</button>
+        ${a.user!=='admin'?`<button class="btn btn-red btn-sm" onclick="removeAcc(${i})">Remove</button>`:''}
+      </td>
+    </tr>`).join('');
+}
+
+function toggleAcc(i) { accounts[i].status = accounts[i].status==='active'?'inactive':'active'; renderAccounts(); toast('Account status updated.'); }
+function removeAcc(i) { if(confirm(`Remove "${accounts[i].name}"?`)) { accounts.splice(i,1); renderAccounts(); toast('Account removed.'); } }
+
+function addAccount() {
+  const name = document.getElementById('an').value.trim();
+  const user = document.getElementById('au').value.trim();
+  if (!name || !user) return toast('Name and username are required.');
+  accounts.push({name, user, role: document.getElementById('ar').value, status:'active'});
+  renderAccounts(); closeModal('accModal'); toast('Account created!');
+  ['an','au','ae','apw'].forEach(id => document.getElementById(id).value = '');
+}
+
+/* ===== PROFILE ===== */
+function saveProfile() {
+  const f = document.getElementById('pf').value;
+  const l = document.getElementById('pl').value;
+  document.getElementById('pDisName').textContent = f + ' ' + l;
+  document.getElementById('avCircle').textContent = (f[0]||'') + (l[0]||'');
+  toast('Profile saved successfully!');
+}
+
+function changePwd() {
+  const c = document.getElementById('cp').value;
+  const n = document.getElementById('np').value;
+  const cn = document.getElementById('cnp').value;
+  if (!c || !n || !cn) return toast('All password fields are required.');
+  if (n !== cn) return toast('New passwords do not match.');
+  ['cp','np','cnp'].forEach(id => document.getElementById(id).value = '');
+  toast('Password updated successfully!');
+}
+
+function changeAvatar(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const av = document.getElementById('avCircle');
+    av.style.backgroundImage = `url(${ev.target.result})`;
+    av.style.backgroundSize = 'cover';
+    av.style.backgroundPosition = 'center';
+    av.textContent = '';
+  };
+  r.readAsDataURL(f);
+}
+
+/* ===== MODALS ===== */
+function openModal(id)  { document.getElementById(id).classList.add('on'); }
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('on'); });
+});
+
+/* ===== TOAST ===== */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.display = 'none', 2800);
+}
+</script>
+</body>
+</html>
