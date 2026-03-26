@@ -1,0 +1,20 @@
+/* auth.css — TrackWise minimal auth styles */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.auth-wrap{width:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.auth-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.brand-row{display:flex;align-items:center;gap:8px;margin-bottom:24px}
+.brand-name{font-size:17px;font-weight:700;color:#1e293b;letter-spacing:-.3px}
+.auth-heading{font-size:22px;font-weight:700;color:#1e293b;margin-bottom:20px;letter-spacing:-.4px}
+.auth-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:7px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.f-group label{font-size:12.5px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.f-group input{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:9px 12px;font-family:'Inter',sans-serif;font-size:14px;color:#1e293b;outline:none;transition:border-color .15s,box-shadow .15s}
+.f-group input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12);background:#fff}
+.f-group input::placeholder{color:#cbd5e1}
+.auth-btn{width:100%;background:#3b82f6;border:none;border-radius:7px;padding:11px;color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:background .15s,transform .1s}
+.auth-btn:hover{background:#2563eb;transform:translateY(-1px)}
+.auth-btn:active{transform:translateY(0)}
+.auth-foot{text-align:center;font-size:13px;color:#64748b;margin-top:20px}
+.auth-foot a{color:#3b82f6;text-decoration:none;font-weight:600}
+.auth-foot a:hover{text-decoration:underline}
